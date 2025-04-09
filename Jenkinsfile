@@ -4,6 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Checkout the code from the GitHub repository
                 git 'https://github.com/haideralimalikk/my-nopde-app.git'
             }
         }
@@ -11,48 +12,38 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
+                    // Install dependencies in the Node.js application
                     sh 'npm install'
                 }
             }
         }
 
-        stage('Build') {
+        stage('Run Application') {
             steps {
                 script {
-                    // You can add a build step if you need to run a build script.
-                    // For example, if you use a bundler or transpiler:
-                    // sh 'npm run build'
+                    // Run the application (start the server)
+                    sh 'node server.js'
                 }
             }
         }
 
-        stage('Test') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    // You can add test steps here if needed.
-                    // Example: Run unit tests with Mocha or Jest
-                    // sh 'npm test'
+                    // Build the Docker image
+                    sh 'docker build -t my-node-app .'
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Push Docker Image') {
             steps {
                 script {
-                    // Add deployment steps here.
-                    // For example, deploying to AWS EC2, running a Docker container, etc.
-                    echo 'Deploying app to server...'
+                    // Push the Docker image to Docker Hub (or any other registry)
+                    sh 'docker push my-node-app'
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Build and Deployment Successful!'
-        }
-        failure {
-            echo 'Build or Deployment Failed!'
         }
     }
 }
+
