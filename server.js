@@ -1,8 +1,7 @@
 var http = require('http');
 var requests = 0;
-var podname = process.env.HOSTNAME;
 var startTime;
-var host;
+var host = require('os').hostname();  // Use os.hostname() directly to get the system's hostname
 
 var handleRequest = function(request, response) {
   response.setHeader('Content-Type', 'text/plain');
@@ -13,11 +12,15 @@ var handleRequest = function(request, response) {
   console.log("Running On:", host, "| Total Requests:", ++requests, "| App Uptime:", (new Date() - startTime) / 1000, "seconds", "| Log Time:", new Date());
 }
 
-// Removed the timeout for server shutdown
+// Set a timeout to stop the server after 5 minutes (300000 milliseconds)
+setTimeout(function() {
+  console.log('Shutting down server after timeout');
+  process.exit(0);  // Exit the application gracefully after 5 minutes
+}, 300000); // 300000 ms = 5 minutes
+
 var www = http.createServer(handleRequest);
 www.listen(8081, function () {
   startTime = new Date();
-  host = process.env.HOSTNAME;
   console.log("Started At:", startTime, "| Running On:", host, "\n");
 });
 
