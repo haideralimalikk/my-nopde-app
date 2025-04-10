@@ -12,7 +12,7 @@ var handleRequest = function(request, response) {
   console.log("Running On:", host, "| Total Requests:", ++requests, "| App Uptime:", (new Date() - startTime) / 1000, "seconds", "| Log Time:", new Date());
 }
 
-// Set a timeout to stop the server after 5 minutes (300000 milliseconds)
+// set a timeout to stop the server after 5 minutes (300000 milliseconds)
 setTimeout(function() {
   console.log('Shutting down server after timeout');
   process.exit(0);  // Exit the application gracefully after 5 minutes
