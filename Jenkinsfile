@@ -23,7 +23,7 @@ pipeline {
         stage('Run Application') {
             steps {
                 script {
-                    // Optional: Can be skipped in CI if not testing runtime behavior
+                    // Optional runtime test
                     sh 'node server.js & sleep 5 && kill $!' 
                 }
             }
@@ -37,14 +37,20 @@ pipeline {
             }
         }
 
+        stage('Login to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
+            }
+        }
+
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Ensure you're logged in to Docker Hub or use Jenkins credentials
                     sh "docker push $DOCKER_IMAGE"
                 }
             }
         }
     }
 }
-
