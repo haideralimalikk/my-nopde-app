@@ -1,10 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = "haideralimalikk/my-node-app"
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from the GitHub repository
                 git 'https://github.com/haideralimalikk/my-nopde-app.git'
             }
         }
@@ -12,7 +15,6 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Install dependencies in the Node.js application
                     sh 'npm install'
                 }
             }
@@ -21,8 +23,8 @@ pipeline {
         stage('Run Application') {
             steps {
                 script {
-                    // Run the application (start the server)
-                    sh 'node server.js'
+                    // Optional: Can be skipped in CI if not testing runtime behavior
+                    sh 'node server.js & sleep 5 && kill $!' 
                 }
             }
         }
@@ -30,8 +32,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image
-                    sh 'docker build -t my-node-app .'
+                    sh "docker build -t $DOCKER_IMAGE ."
                 }
             }
         }
@@ -39,8 +40,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Push the Docker image to Docker Hub (or any other registry)
-                    sh 'docker push my-node-app'
+                    // Ensure you're logged in to Docker Hub or use Jenkins credentials
+                    sh "docker push $DOCKER_IMAGE"
                 }
             }
         }
