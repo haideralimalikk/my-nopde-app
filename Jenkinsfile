@@ -5,7 +5,7 @@ pipeline {
         // Customize these values:
         DOCKER_IMAGE = "haideralimalikk/my-node-app"  // Your DockerHub image
         GIT_REPO = "https://github.com/haideralimalikk/my-nopde-app.git"
-        GIT_BRANCH = "main"  // Or your branch name
+        GIT_BRANCH = "master"  // Or your branch name
     }
 
     stages {
