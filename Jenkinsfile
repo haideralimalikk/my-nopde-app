@@ -2,16 +2,21 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "haideralimalikk/my-node-app"
-        K8S_SERVER = "ec2-54-90-119-157.compute-1.amazonaws.com"  // Your production server
+        // Customize these values:
+        DOCKER_IMAGE = "haideralimalikk/my-node-app"  // Your DockerHub image
+        GIT_REPO = "https://github.com/haideralimalikk/my-nopde-app.git"
+        GIT_BRANCH = "main"  // Or your branch name
     }
 
     stages {
-        // Stage 3a: GitHub triggers automatically (via webhook)
+        // Stage 3a: GitHub triggers automatically
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/haideralimalikk/my-nopde-app.git', 
-                    branch: 'master'  // Explicit branch
+                git(
+                    url: "${env.GIT_REPO}",
+                    branch: "${env.GIT_BRANCH}",
+                    credentialsId: 'github-token'  // From Jenkins credentials
+                )
             }
         }
 
@@ -19,25 +24,24 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}:latest")
+                    sh """
+                        docker build -t ${env.DOCKER_IMAGE} .
+                        docker images | grep ${env.DOCKER_IMAGE}
+                    """
                 }
             }
         }
 
-        // Stage 3c: Test container (build test)
+        // Stage 3c: Test container (health check)
         stage('Test') {
             steps {
                 script {
-                    // Run container and verify it starts
-                    def testContainer = docker.run(
-                        "${DOCKER_IMAGE}:latest",
-                        "-d -p 8081:8081 --name test-app"  // Match your app's port
-                    )
-                    sleep(10)  // Wait for app to start
-                    sh '''
-                        curl -s http://localhost:8081 | grep "Coursework 2" || exit 1
-                    '''
-                    sh "docker stop test-app && docker rm test-app"
+                    sh """
+                        docker run -d --name test-container -p 8081:8081 ${env.DOCKER_IMAGE}
+                        sleep 10  # Wait for app to start
+                        curl -s http://localhost:8081 | grep 'Coursework 2' || exit 1
+                        docker stop test-container && docker rm test-container
+                    """
                 }
             }
         }
@@ -46,24 +50,25 @@ pipeline {
         stage('Push') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'docker-hub',  // Must match Jenkins credential ID
+                    credentialsId: 'docker-hub',  // From Jenkins credentials
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh """
-                        docker push "${DOCKER_IMAGE}:latest"
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${env.DOCKER_IMAGE}
                     """
                 }
             }
         }
 
-        // Stage 3e: Deploy to Kubernetes (without downtime)
+        // Stage 3e: Deploy to Kubernetes
         stage('Deploy') {
             steps {
-                sshagent(['production-server-ssh']) {  // Jenkins SSH credential ID
+                sshagent(['production-server-ssh']) {  // From Jenkins credentials
                     sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${K8S_SERVER} \
-                        "kubectl set image deployment/node-app-deployment node-app=${DOCKER_IMAGE}:latest"
+                        ssh -o StrictHostKeyChecking=no ubuntu@ec2-54-90-119-157.compute-1.amazonaws.com \
+                        "kubectl set image deployment/node-app-deployment node-app=${env.DOCKER_IMAGE}"
                     """
                 }
             }
