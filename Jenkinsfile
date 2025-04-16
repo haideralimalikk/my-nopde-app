@@ -64,14 +64,19 @@ pipeline {
 
         // Stage 3e: Deploy to Kubernetes
         stage('Deploy') {
-            steps {
-                sshagent(['production-server-ssh']) {  // From Jenkins credentials
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@ec2-54-90-119-157.compute-1.amazonaws.com \
-                        "kubectl set image deployment/node-app-deployment node-app=${env.DOCKER_IMAGE}"
-                    """
-                }
-            }
+    steps {
+        withCredentials([sshUserPrivateKey(
+            credentialsId: 'production-server-ssh',
+            keyFileVariable: 'SSH_KEY',
+            usernameVariable: 'SSH_USER'
+        )]) {
+            sh """
+                chmod 600 ${SSH_KEY}
+                ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@ec2-54-90-119-157.compute-1.amazonaws.com \
+                "kubectl set image deployment/node-app-deployment node-app=${env.DOCKER_IMAGE}"
+            """
         }
+    }
+}
     }
 }
