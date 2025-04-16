@@ -10,8 +10,8 @@ pipeline {
         // Stage 3a: GitHub triggers automatically (via webhook)
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/haideralimalikk/my-node-app.git', 
-                    branch: 'main'  // Explicit branch
+                git url: 'https://github.com/haideralimalikk/my-nopde-app.git', 
+                    branch: 'master'  // Explicit branch
             }
         }
 
