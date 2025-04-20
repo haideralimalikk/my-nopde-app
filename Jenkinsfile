@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "haideralimalikk/my-node-app:${env.BUILD_NUMBER}" # Versioned
+        DOCKER_IMAGE = "haideralimalikk/my-node-app:${env.BUILD_NUMBER}"
         GIT_REPO = "https://github.com/haideralimalikk/my-nopde-app.git"
     }
 
