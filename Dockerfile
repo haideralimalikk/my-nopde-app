@@ -7,7 +7,7 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 8081 # Must match server.js
+EXPOSE 8081 
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s \
