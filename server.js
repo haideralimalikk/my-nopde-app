@@ -13,9 +13,18 @@ var handleRequest = function(request, response) {
 }
 
 
-var www = http.createServer(handleRequest);
-www.listen(8081, function () {
+// Add graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('Graceful shutdown initiated');
+  server.close(() => {
+    console.log('Server terminated');
+    process.exit(0);
+  });
+});
+
+// Bind to all interfaces
+www.listen(8081, '0.0.0.0', () => {
   startTime = new Date();
-  console.log("Started At:", startTime, "| Running On:", host, "\n");
+  console.log(`Started at ${startTime} on ${host}:8081`);
 });
 
