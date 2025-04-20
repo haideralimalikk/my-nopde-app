@@ -2,7 +2,7 @@ var http = require('http');
 var requests = 0;
 var startTime;
 var host = require('os').hostname();  // Use os.hostname() directly to get the system's hostname
-
+//haider ali commit
 var handleRequest = function(request, response) {
   response.setHeader('Content-Type', 'text/plain');
   response.writeHead(200);
