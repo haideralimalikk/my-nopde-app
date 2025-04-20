@@ -1,20 +1,16 @@
-# Use the official Node.js image from Docker Hub
 FROM node:16
 
-# Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the package.json and package-lock.json (if present)
 COPY package*.json ./
-
-# Install the app dependencies
 RUN npm install
 
-# Copy the rest of the application code
 COPY . .
 
-# Expose the port the app runs on (change if your app uses a different port)
-EXPOSE 8081
+EXPOSE 8081 # Must match server.js
 
-# Command to run the app
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:8081/ || exit 1
+
 CMD [ "node", "server.js" ]
