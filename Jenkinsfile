@@ -72,7 +72,7 @@ pipeline {
         )]) {
             sh """
                 chmod 600 ${SSH_KEY}
-                ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@ec2-54-90-119-157.compute-1.amazonaws.com \
+                ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@ec2-3-89-136-251.compute-1.amazonaws.com \
                 "kubectl set image deployment/node-app-deployment node-app=${env.DOCKER_IMAGE}"
             """
         }
