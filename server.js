@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 var http = require('http');
 var requests = 0;
 var startTime;
@@ -12,15 +11,12 @@ var handleRequest = function(request, response) {
   response.end(" | v=0\n");
   console.log("Running On:", host, "| Total Requests:", ++requests, "| App Uptime:", (new Date() - startTime) / 1000, "seconds", "| Log Time:", new Date());
 }
-=======
 const http = require('http');
 const hostname = require('os').hostname();
 const port = process.env.PORT || 8081; // Use environment variable
 
 let requests = 0;
 let startTime = new Date();
->>>>>>> 91e29a7c08832984ff1af0dfd5c1edbc53c27bdb
-
 const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', 'text/plain');
   res.writeHead(200);
