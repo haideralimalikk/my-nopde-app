@@ -69,23 +69,21 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                withCredentials([sshUserPrivateKey(
-                    credentialsId: 'production-server-ssh',
-                    keyFileVariable: 'SSH_KEY',
-                    usernameVariable: 'SSH_USER'
-                )]) {
-                    sh """
-                        chmod 600 ${SSH_KEY}
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@ec2-3-89-136-251.compute-1.amazonaws.com \
-                        "kubectl set image deployment/node-app-deployment node-app=${env.DOCKER_IMAGE}"
-                    """
-                }
-            }
+      stage('Deploy') {
+    steps {
+        withCredentials([sshUserPrivateKey(
+            credentialsId: 'production-server-ssh',
+            keyFileVariable: 'SSH_KEY',
+            usernameVariable: 'SSH_USER'
+        )]) {
+            sh """
+                ssh -i ${SSH_KEY} ${SSH_USER}@ec2-3-89-136-251.compute-1.amazonaws.com \
+                "kubectl set image deployment/node-app-deployment node-app=haideralimalikk/my-node-app:latest && \
+                 kubectl rollout restart deployment/node-app-deployment"
+            """
         }
     }
-
+}
     post {
         always {
             script {
