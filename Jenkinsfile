@@ -40,13 +40,13 @@ pipeline {
                     // Run new container with unique name
                     sh """
                         docker run -d --name ${env.CONTAINER_NAME} -p 8081:8081 ${env.DOCKER_IMAGE}
-                        sleep 15  # Increased wait time
+                        sleep 15  // Increased wait time
                         
-                        # Add debugging commands
+                        // Add debugging commands
                         docker ps -a
                         docker logs ${env.CONTAINER_NAME}
                         
-                        # Health check
+                        // Health check
                         curl -v http://localhost:8081
                         curl -s http://localhost:8081 | grep 'Coursework 2' || exit 1
                     """
@@ -69,21 +69,23 @@ pipeline {
             }
         }
 
-      stage('Deploy') {
-    steps {
-        withCredentials([sshUserPrivateKey(
-            credentialsId: 'production-server-ssh',
-            keyFileVariable: 'SSH_KEY',
-            usernameVariable: 'SSH_USER'
-        )]) {
-            sh """
-                ssh -i ${SSH_KEY} ${SSH_USER}@ec2-3-89-136-251.compute-1.amazonaws.com \
-                "kubectl set image deployment/node-app-deployment node-app=haideralimalikk/my-node-app:latest && \
-                 kubectl rollout restart deployment/node-app-deployment"
-            """
+        stage('Deploy') {
+            steps {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'production-server-ssh',
+                    keyFileVariable: 'SSH_KEY',
+                    usernameVariable: 'SSH_USER'
+                )]) {
+                    sh """
+                        ssh -i ${SSH_KEY} ${SSH_USER}@ec2-3-89-136-251.compute-1.amazonaws.com \
+                        "kubectl set image deployment/node-app-deployment node-app=haideralimalikk/my-node-app:latest && \
+                         kubectl rollout restart deployment/node-app-deployment"
+                    """
+                }
+            }
         }
-    }
-}
+    }  // <-- THIS WAS MISSING (closing brace for stages)
+
     post {
         always {
             script {
