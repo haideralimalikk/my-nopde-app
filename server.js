@@ -4,7 +4,7 @@ const port = process.env.PORT || 8081;
 
 let requests = 0;
 let startTime = new Date();
-//Haider's commit 3.0
+//Haider's commit 4.0
 const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', 'text/plain');
   res.writeHead(200);
