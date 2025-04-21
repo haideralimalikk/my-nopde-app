@@ -40,13 +40,13 @@ pipeline {
                     // Run new container with unique name
                     sh """
                         docker run -d --name ${env.CONTAINER_NAME} -p 8081:8081 ${env.DOCKER_IMAGE}
-                        sleep 15  // Increased wait time
+                        sleep 15  # Increased wait time
                         
-                        // Add debugging commands
+                        # Add debugging commands
                         docker ps -a
                         docker logs ${env.CONTAINER_NAME}
                         
-                        // Health check
+                        # Health check
                         curl -v http://localhost:8081
                         curl -s http://localhost:8081 | grep 'Coursework 2' || exit 1
                     """
